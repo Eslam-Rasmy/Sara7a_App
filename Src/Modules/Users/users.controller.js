@@ -3,11 +3,13 @@ import * as service from "./users.services.js"
 import { authenticationMiddlewares } from './../../Middlewares/authentication.middlewares.js';
 import { authorizationMiddlewares } from "../../Middlewares/authorization.middlewares.js";
 import { Privillages, RoleEnum } from "../../Common/enums/userenum.js";
+import { validationMiddlewares } from "../../Middlewares/validation.middlewares.js";
+import { SignUpSchema } from "../../Validators/Schemas/user.schema.js";
 const usersController = Router()
 
 
 
-usersController.post("/add", service.SignUpService)
+usersController.post("/add",validationMiddlewares(SignUpSchema), service.SignUpService)
 usersController.put("/update", authenticationMiddlewares, service.UpdateService)
 usersController.delete("/delete", authenticationMiddlewares, service.deleteService)
 usersController.get("/list", authenticationMiddlewares, authorizationMiddlewares(Privillages.ADMINS), service.listUserServide)

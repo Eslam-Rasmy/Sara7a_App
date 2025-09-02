@@ -21,3 +21,10 @@ export const Privillages = {
     USER_ADMIN: [RoleEnum.USER, RoleEnum.ADMIN],
     USER_SUPER_ADMIN: [RoleEnum.USER, RoleEnum.SUPER_ADMIN],
 }
+
+
+export const SkillevelEnum = {
+    BEGINEER: "beginer",
+    INTERMEDIATE: "intermediate",
+    ADVANCED: "advanced"
+}
