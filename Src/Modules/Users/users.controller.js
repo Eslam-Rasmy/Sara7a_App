@@ -4,15 +4,15 @@ import { authenticationMiddlewares } from './../../Middlewares/authentication.mi
 import { authorizationMiddlewares } from "../../Middlewares/authorization.middlewares.js";
 import { Privillages, RoleEnum } from "../../Common/enums/userenum.js";
 import { validationMiddlewares } from "../../Middlewares/validation.middlewares.js";
-import { SignUpSchema } from "../../Validators/Schemas/user.schema.js";
+import { SignUpSchema,updateSchema } from "../../Validators/Schemas/user.schema.js";
 const usersController = Router()
 
 
 
 usersController.post("/add",validationMiddlewares(SignUpSchema), service.SignUpService)
-usersController.put("/update", authenticationMiddlewares, service.UpdateService)
+usersController.put("/update", authenticationMiddlewares,validationMiddlewares(updateSchema),  service.UpdateService)
 usersController.delete("/delete", authenticationMiddlewares, service.deleteService)
-usersController.get("/list", authenticationMiddlewares, authorizationMiddlewares(Privillages.ADMINS), service.listUserServide)
+usersController.get("/list", authenticationMiddlewares, authorizationMiddlewares(Privillages.USER), service.listUserServide)
 usersController.post("/signIn", service.SignInService)
 usersController.put("/confirm", service.ConfirmEmailService)
 usersController.put("/confirmPass", service.ConfirmPassService)

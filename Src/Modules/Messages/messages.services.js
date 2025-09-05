@@ -30,8 +30,8 @@ export const GetMessageService = async (req, res) => {
 
     const messages = await Message.find().populate([
         {
-            path:"receiverId", 
-            select:"firstName lastName"
+            path: "receiverId",
+            select: "firstName lastName"
         }
     ])
 
@@ -39,3 +39,18 @@ export const GetMessageService = async (req, res) => {
 
 
 }
+
+export const GetMessageLogService = async (req, res) => {
+
+    const { user: { _id } } = req.loggedInUser    
+
+    const message = await Message.find({ receiverId: _id });
+    if (!message) {
+        return res.status(404).json({ message: "User not found or not have message" });
+    }
+
+    return res.status(200).json({ message: "message get successfully", message })
+
+}   
+
+    

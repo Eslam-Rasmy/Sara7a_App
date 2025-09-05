@@ -7,6 +7,8 @@ const messagesController = Router()
 
 messagesController.post("/send/:receiverId", service.sendMessageService)
 messagesController.get("/get", service.GetMessageService)
+messagesController.get("/getLoggedin",authenticationMiddlewares, service.GetMessageLogService)
+
 
 
 

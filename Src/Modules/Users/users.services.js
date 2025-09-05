@@ -28,8 +28,8 @@ export const SignUpService = async (req, res) => {
             return res.status(400).json({ error: "user already exists" });
         }
 
-        /*         const encryptPN = asymetricEncryption(phoneNumber)
-         */
+        const encryptPN = asymetricEncryption(phoneNumber)
+
         const hashPassword = hashSync(password, +process.env.SALT_Rounds)
 
         const otp = uniqeString()
@@ -41,7 +41,7 @@ export const SignUpService = async (req, res) => {
             password: hashPassword,
             age,
             gender,
-            phoneNumber,
+            phoneNumber: encryptPN,
             otps: { confirmation: hashSync(otp, +process.env.SALT_Rounds), resetPassword: null }
         })
 
@@ -181,9 +181,9 @@ export const UpdateService = async (req, res) => {
                 return res.status(400).json({ message: "user not found" })
             } */
 
-        const user = await User.findByIdAndUpdate(
+        const user = await User.findByIdAndUpdate(  
             _id,
-            { firstName, lastName, email, age, gender, phoneNumber },
+            { firstName, lastName, email, age, gender, phoneNumber:asymetricEncryption(phoneNumber) },
             { new: true }
         )
 
@@ -242,7 +242,7 @@ export const deleteService = async (req, res) => {
 
 export const listUserServide = async (req, res) => {
     try {
-        let users = await User.find().populate("Messages")
+        let users = await User.find().select("-password").populate("Messages")
         /*   users = users.map((user) => {
               return {
                   ...user._doc,
