@@ -4,13 +4,13 @@ import { authenticationMiddlewares } from './../../Middlewares/authentication.mi
 import { authorizationMiddlewares } from "../../Middlewares/authorization.middlewares.js";
 import { Privillages, RoleEnum } from "../../Common/enums/userenum.js";
 import { validationMiddlewares } from "../../Middlewares/validation.middlewares.js";
-import { SignUpSchema,updateSchema } from "../../Validators/Schemas/user.schema.js";
+import { SignUpSchema, updateSchema,updatePassSchema,newPassSchema } from "../../Validators/Schemas/user.schema.js";
 const usersController = Router()
 
 
 
-usersController.post("/add",validationMiddlewares(SignUpSchema), service.SignUpService)
-usersController.put("/update", authenticationMiddlewares,validationMiddlewares(updateSchema),  service.UpdateService)
+usersController.post("/add", validationMiddlewares(SignUpSchema), service.SignUpService)
+usersController.put("/update", authenticationMiddlewares, validationMiddlewares(updateSchema), service.UpdateService)
 usersController.delete("/delete", authenticationMiddlewares, service.deleteService)
 usersController.get("/list", authenticationMiddlewares, authorizationMiddlewares(Privillages.USER), service.listUserServide)
 usersController.post("/signIn", service.SignInService)
@@ -18,9 +18,9 @@ usersController.put("/confirm", service.ConfirmEmailService)
 usersController.put("/confirmPass", service.ConfirmPassService)
 usersController.post("/logout", authenticationMiddlewares, service.LogoutService)
 usersController.post("/refersh", service.RefershTokenServide)
-usersController.post("/updatepass", authenticationMiddlewares, service.UpdatePasswordService)
+usersController.post("/updatepass", authenticationMiddlewares, validationMiddlewares(updatePassSchema), service.UpdatePasswordService)
 usersController.post("/resetPass", service.ResetPasswordService)
-usersController.post("/NewPass", service.NewPassService)
+usersController.post("/NewPass",validationMiddlewares(newPassSchema), service.NewPassService)
 
 
 

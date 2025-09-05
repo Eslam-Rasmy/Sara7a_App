@@ -151,10 +151,6 @@ export const UpdateService = async (req, res) => {
     try {
         /*         const { userId } = req.params
          */
-
-        const { user: { _id } } = req.loggedInUser
-        const { firstName, lastName, email, age, gender, phoneNumber } = req.body
-
         /*  const user = await User.findById(userId)
          if (!user) {
              return res.status(400).json({ message: "user not found" })
@@ -180,10 +176,18 @@ export const UpdateService = async (req, res) => {
             if (!updateResuly.modifiedCount) {
                 return res.status(400).json({ message: "user not found" })
             } */
+        const { token: { tokenId }, user: { _id } } = req.loggedInUser
+        const { firstName, lastName, email, age, gender, phoneNumber } = req.body
 
-        const user = await User.findByIdAndUpdate(  
+        const blackListToken = await BlackListedToken.findOne({ tokenId })
+        if (blackListToken) {
+            return res.status(401).json({ message: "Token is blackListed" })
+        }
+
+
+        const user = await User.findByIdAndUpdate(
             _id,
-            { firstName, lastName, email, age, gender, phoneNumber:asymetricEncryption(phoneNumber) },
+            { firstName, lastName, email, age, gender, phoneNumber: asymetricEncryption(phoneNumber) },
             { new: true }
         )
 
@@ -299,19 +303,19 @@ export const UpdatePasswordService = async (req, res) => {
 
         const { user: { _id } } = req.loggedInUser
 
-        const { Oldpassword, newPassword, confirmPassword } = req.body
+        const { oldPassword, newPassword, confirmPassword } = req.body
 
 
         const user = await User.findById(_id);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-
+        
         if (newPassword !== confirmPassword) {
             return res.status(400).json({ message: "New password and confirm password not matched" });
         }
 
-        const isMatch = compareSync(Oldpassword, user.password);
+        const isMatch = compareSync(oldPassword, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: "Old password is incorrect" });
         }

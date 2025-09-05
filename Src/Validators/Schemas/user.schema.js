@@ -48,3 +48,27 @@ export const updateSchema = {
 }
 
 
+
+
+export const updatePassSchema = {
+    body: Joi.object({
+        oldPassword: Joi.string().required(),
+        newPassword: Joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/).required().messages({
+            "string.pattern.base": "Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character",
+        }),
+        confirmPassword: Joi.string().valid(Joi.ref("newPassword"))
+    })
+}
+
+export const newPassSchema = {
+    body: Joi.object({
+        email: Joi.string().email({ tlds: { allow: false } }).messages({
+            "string.email": "Email must be a valid email address."
+        }),
+        newPassword: Joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/).required().messages({
+            "string.pattern.base": "Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character",
+        }),
+        confirmPassword: Joi.string().valid(Joi.ref("newPassword"))
+    })
+}
+
