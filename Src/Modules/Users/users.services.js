@@ -310,7 +310,7 @@ export const UpdatePasswordService = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-        
+
         if (newPassword !== confirmPassword) {
             return res.status(400).json({ message: "New password and confirm password not matched" });
         }
@@ -414,6 +414,20 @@ export const NewPassService = async (req, res) => {
         return res.status(200).json({ message: "Password updated successfully" });
 
 
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "error", error })
+    }
+}
+
+
+export const DeletExpiredTokenService = async (req, res) => {
+    try {
+        const result = await BlackListedToken.deleteMany({
+            expiresAt: { $lt: new Date() }
+        });
+
+        return res.status(200).json({ message: "Expired tokens deleted successfully",result });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "error", error })
