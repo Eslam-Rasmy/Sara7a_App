@@ -424,7 +424,7 @@ export const NewPassService = async (req, res) => {
 export const DeletExpiredTokenService = async (req, res) => {
     try {
         const result = await BlackListedToken.deleteMany({
-            expiresAt: { $lt: new Date() }
+            expirationDate: { $lt: new Date() }
         });
 
         return res.status(200).json({ message: "Expired tokens deleted successfully",result });
