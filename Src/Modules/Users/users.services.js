@@ -9,6 +9,7 @@ import { generateToken, verifyToken } from "../../Utils/tokens.utils.js";
 import BlackListedToken from "../../DB/Models/black-listed.model.js";
 import Message from './../../DB/Models/message.model.js';
 import { mongoose } from 'mongoose';
+import  fs  from 'fs';
 
 
 const uniqeString = customAlphabet("dgu873iuhey3e", 5)
@@ -225,6 +226,7 @@ export const deleteService = async (req, res) => {
         if (!deleteResult) {
             return res.status(400).json({ message: "user not found" })
         }
+        fs.unlinkSync(deleteResult.profilePicture)
 
         await Message.deleteMany({ receiverId: _id }, { session })
 
@@ -427,7 +429,24 @@ export const DeletExpiredTokenService = async (req, res) => {
             expirationDate: { $lt: new Date() }
         });
 
-        return res.status(200).json({ message: "Expired tokens deleted successfully",result });
+        return res.status(200).json({ message: "Expired tokens deleted successfully", result });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "error", error })
+    }
+}
+
+
+export const UploadProfileService = async (req, res) => {
+
+    try {
+        const { user: { _id } } = req.loggedInUser
+        const { path } = req.file
+
+        const user = await User.findByIdAndUpdate(_id, { profilePicture: path }, { new: true })
+
+        return res.status(200).json({ message: "profile uploaded successfully", user })
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({ message: "error", error })

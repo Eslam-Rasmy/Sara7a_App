@@ -5,6 +5,7 @@ import { authorizationMiddlewares } from "../../Middlewares/authorization.middle
 import { Privillages, RoleEnum } from "../../Common/enums/userenum.js";
 import { validationMiddlewares } from "../../Middlewares/validation.middlewares.js";
 import { SignUpSchema, updateSchema,updatePassSchema,newPassSchema } from "../../Validators/Schemas/user.schema.js";
+import { localupload } from './../../Middlewares/multer.middlewares.js';
 const usersController = Router()
 
 
@@ -22,6 +23,9 @@ usersController.post("/refersh", service.RefershTokenServide)
 usersController.post("/updatepass", authenticationMiddlewares, validationMiddlewares(updatePassSchema), service.UpdatePasswordService)
 usersController.post("/resetPass", service.ResetPasswordService)
 usersController.post("/NewPass",validationMiddlewares(newPassSchema), service.NewPassService)
+usersController.post("/upload-profile",authenticationMiddlewares,localupload("profile"), service.UploadProfileService)
+
+
 
 
 
