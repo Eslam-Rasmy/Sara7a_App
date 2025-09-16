@@ -9,7 +9,8 @@ import { generateToken, verifyToken } from "../../Utils/tokens.utils.js";
 import BlackListedToken from "../../DB/Models/black-listed.model.js";
 import Message from './../../DB/Models/message.model.js';
 import { mongoose } from 'mongoose';
-import  fs  from 'fs';
+import fs from 'fs';
+import { deleteFileCloudinary, uploadFileCloudinary } from "../../Common/Services/cloudinary.service.js";
 
 
 const uniqeString = customAlphabet("dgu873iuhey3e", 5)
@@ -228,6 +229,8 @@ export const deleteService = async (req, res) => {
         }
         fs.unlinkSync(deleteResult.profilePicture)
 
+        await deleteFileCloudinary(deleteResult.profilePicture.public_id)
+
         await Message.deleteMany({ receiverId: _id }, { session })
 
         await session.commitTransaction()
@@ -443,7 +446,16 @@ export const UploadProfileService = async (req, res) => {
         const { user: { _id } } = req.loggedInUser
         const { path } = req.file
 
-        const user = await User.findByIdAndUpdate(_id, { profilePicture: path }, { new: true })
+        const { secure_url, public_id } = await uploadFileCloudinary(path, {
+            folder: "Sarahah_App/Users/Profiles"
+        })
+
+        const user = await User.findByIdAndUpdate(_id, {
+            profilePicture: {
+                secure_url,
+                public_id
+            }
+        }, { new: true })
 
         return res.status(200).json({ message: "profile uploaded successfully", user })
 
@@ -451,4 +463,13 @@ export const UploadProfileService = async (req, res) => {
         console.log(error);
         return res.status(500).json({ message: "error", error })
     }
+}
+
+
+export const DeleteCloudinaryService = async (req, res) => {
+    const { public_id } = req.body
+    const result = await deleteFileCloudinary(public_id)
+
+    return res.status(200).json({ message: "file deleted successfully", result })
+
 }

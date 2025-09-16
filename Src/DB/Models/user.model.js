@@ -54,7 +54,8 @@ const userSchema = new mongoose.Schema({
         default: RoleEnum.USER
     },
     profilePicture: {
-        type: String
+        secure_url: String,
+        public_id: String
     }
 }, {
     timestamps: true,

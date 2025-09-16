@@ -42,3 +42,35 @@ export const localupload = () => {
     }).single("profile")
 }
 
+
+
+export const hostupload = () => {
+
+    const storage = multer.diskStorage({})
+
+    const fileFilter = (req, file, cb) => {
+
+        console.log("Incoming File:", {
+            fieldname: file.fieldname,
+            originalname: file.originalname,
+            mimetype: file.mimetype,
+        });
+
+        const fileKey = file.mimetype.split("/")[0].toUpperCase()
+        const fileType = fileTyps[fileKey]
+        if (!fileType) return cb(new Error("invaild file type"), false)
+
+        const fileExtention = file.mimetype.split("/")[1]
+        if (!allowedFileExtentions[fileType].includes(fileExtention)) {
+            return cb(new Error("invalid file extension"), false);
+        }
+
+        return cb(null, true)
+    }
+
+    return multer({
+        limits: {
+            fileSize: 1024 * 1024 * 2
+        }, fileFilter, storage
+    }).single("profile")
+}
