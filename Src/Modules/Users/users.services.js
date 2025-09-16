@@ -11,6 +11,7 @@ import Message from './../../DB/Models/message.model.js';
 import { mongoose } from 'mongoose';
 import fs from 'fs';
 import { deleteFileCloudinary, uploadFileCloudinary } from "../../Common/Services/cloudinary.service.js";
+import Active from "../../DB/Models/active.model.js";
 
 
 const uniqeString = customAlphabet("dgu873iuhey3e", 5)
@@ -110,6 +111,23 @@ export const SignInService = async (req, res) => {
                 expiresIn: process.env.JWT_REFERSH_EXPIRES_IN,
                 jwtid: uuidv4(),
             })
+
+
+        const expirationDate = new Date(Date.now() + (parseInt(process.env.JWT_ACCESS_EXPIRES_IN) * 1000));
+
+        const sessionCount = await Active.countDocuments({ userId: user._id });
+        if (sessionCount >= 2) {
+            const oldestSession = await Active.findOne({ userId: user._id }).sort({ createdAt: 1 });
+            if (oldestSession) await oldestSession.deleteOne();
+        }
+
+        await Active.create({
+            userId: user._id,
+            tokenId: uuidv4(),
+            expirationDate,
+            userAgent: req.headers["user-agent"],
+            ip: req.ip
+        });
 
         return res.status(201).json({ message: "User signIn succesfully", user, accesstoken, refershToken })
 
@@ -274,6 +292,7 @@ export const LogoutService = async (req, res) => {
 
     const { token: { tokenId, expirationDate }, user: { _id } } = req.loggedInUser
 
+    await Active.deleteOne({ tokenId });
 
     const blackListedToken = await BlackListedToken.create({
         tokenId,
